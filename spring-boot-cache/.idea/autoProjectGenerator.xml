@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PluginProjectConfig">
+    <option name="path" value="$PROJECT_DIR$/src/main/java/com/springbootcache/bean" />
+    <option name="pagerQuery" value="false" />
+    <option name="overwrite" value="true" />
+    <option name="generateBase" value="true" />
+    <option name="sql" value="create table employee&#10;(&#10;  id        int           not null&#10;    primary key,&#10;  last_NAME varchar(15)   null,&#10;  email     varchar(35)   null,&#10;  gender    int default 0 not null,&#10;  d_id      int           null&#10;);&#10;&#10;" />
+  </component>
+</project>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//conf.mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mybatis.dao.DemoUseMapper">
+
+    <!-- getUserById -->
+    <select id="getUserById" parameterType="Integer" resultType="com.mybatis.model.DemoUser">
+        select * from demo_user where user_id = #{userId}
+    </select>
+
+    <!-- getUserList -->
+    <select id="getUserList" resultType="com.mybatis.model.DemoUser" >
+        select * from demo_user order by user_id
+    </select>
+
+    <!-- insertUser -->
+    <insert id="insertUser" parameterType="com.mybatis.model.DemoUser" >
+        <!-- <insert 中添加 useGeneratedKeys="true" keyProperty="id" -->
+    <!-- 用于自增id <selectKey keyProperty="id" order="BEFORE">
+       select user_seq.nextval from dual
+   </selectKey> -->
+       insert into demo_user(USER_ID, USER_NAME, IN_TIME)
+         VALUES(#{userId}, #{userName}, #{inTime})
+   </insert>
+
+   <!-- updateUser -->
+    <update id="updateUser" parameterType="com.mybatis.model.DemoUser">
+        update demo_user SET
+        user_name = #{userName},
+        in_time = #{inTime}
+        where user_id = #{userId}
+    </update>
+
+    <!-- deleteUser -->
+    <delete id="deleteUser" parameterType="int">
+        DELETE from demo_user where user_id = #{userId}
+    </delete>
+
+</mapper>

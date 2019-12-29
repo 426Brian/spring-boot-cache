@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//conf.mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+
+    <!-- 可以通过使用properties 来引入外部properties 配置文件的内容
+         resource: 引入类路径或磁盘路径下的资源
+         url: 引入网络路径下的资源-->
+    <properties resource="conf/db/jdbc.properties"></properties>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+        <setting name="logImpl" value="STDOUT_LOGGING" />
+
+        <!--字段为null时，全局配置-->
+        <setting name="jdbcTypeForNull" value="NULL"/>
+
+        <!-- 延迟加载 -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="aggressiveLazyLoading" value="false"/>
+            <!-- 二级缓存 -->
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
+
+
+    <!-- 别名处理器 -->
+    <typeAliases>
+        <typeAlias alias="DemoUser" type="com.mybatis.model.DemoUser"></typeAlias>
+
+        <!--批量起别名， 当冲突时可以在具体类上用注解@Alias起别名-->
+        <package name="com.conf.mybatis.model"/>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="url" value="${jdbc.url}"/>
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="username" value="${jdbc.user}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <mapper resource="conf/mybatis/impl/DemoUser.xml"/>
+    </mappers>
+</configuration>

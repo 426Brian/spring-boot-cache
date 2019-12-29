@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//conf.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.dao.EmployeeDynamicSql">
+    <!--ehcach二级缓存-->
+  <!--  <cache type="org.mybatis.caches.ehcache.EhcacheCache">
+
+    </cache>-->
+
+    <!--
+    conf.mybatis 原始二级缓存
+    <cache eviction="FIFO" flushInterval="60000" readOnly="false" size="1024"></cache>-->
+   <!-- eviction:缓存的回收策略：
+        LRU: 最近最少使用的，移除最长时间不被使用的对象
+        FIFO: 先进先出，按对象进入缓存的顺序来移除它们
+        SOFT: 软引用，移除基于垃圾回收器状态和软引用规则的对象
+        WEAK: 弱引用，更积极地移除基于垃圾回收器和弱引用规则的对象
+        默认的是 LRU
+    flushInterval: 缓存刷新间隔
+        缓存多长时间清空一次，默认不清空，设置一个毫秒值
+    readOnly: 是否只读
+        true：只读 conf.mybatis 认为所有从缓存中获取数据的操作都是只读操作，不会修改数据
+                conf.mybatis 为了加速获取速度，直接就会将数据在缓存中的应用交给用户，不安全，速度快
+        false: 非只读，conf.mybatis 觉得获取的数据可能会被修改
+                conf.mybatis 会利用序列化 & 反序列化的技术克隆一份新的数据给你，安全，速度慢
+        size: 缓存中元素个数
+        type：指定自定义缓存的全类名（实现Cache接口）
+        -->
+    <!--
+    if 判断
+      choose (when, otherwise) 分支选择
+      如果有id,
+      thrim (where, set)
+      foreach -->
+    <select id="getEmpIf" resultType="com.mybatis.model.Emp">
+        select * from EMP
+        <where>
+            <bind name="_job" value="'%'+job+'%'"/>
+            <if test="empno != null">
+                EMPNO = #{empno}
+            </if>
+            <!--遇到特殊符号用转义字符 -->
+            <if test="ename != null and ename != ''">
+                and ename = #{ename}
+            </if>
+            <if test="sal != null">
+                and sal = #{sal}
+            </if>
+            <if test="gender == 'F' or gender == 'M'">
+                and gender = #{gender}
+            </if>
+            <if test="_job != null">
+              and job like #{_job}
+            </if>
+        </where>
+    </select>
+
+    <select id="getEmpChoose" resultType="com.mybatis.model.Emp">
+        select * from EMP
+        <where>
+            <choose>
+                <when test="empno != null">
+                    empno = #{empno}
+                </when>
+                <when test="sal != null">
+                    sal = #{sal}
+                </when>
+                <when test="comm != null">
+                    comm = #{comm}
+                </when>
+                <otherwise>
+                    1 = 1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <update id="setEmp">
+        update emp
+        <trim prefix="set" suffixOverrides=",">
+
+            <if test="empno != null">
+                EMPNO = #{empno},
+            </if>
+            <!--遇到特殊符号用转义字符 -->
+            <if test="ename != null and ename != ''">
+                ename = #{ename},
+            </if>
+            <if test="sal != null">
+                sal = #{sal},
+            </if>
+            <if test="gender == 'F' or gender == 'M'">
+                gender = #{gender}
+            </if>
+        </trim>
+        <where>
+            empno = #{empno}
+        </where>
+    </update>
+
+    <select id="selectForeach" resultType="com.mybatis.model.Emp">
+        select * from EMP
+        <foreach collection="empnos" item="empno" separator="," open="where empno in("
+                 close=")">
+            #{empno}
+        </foreach>
+    </select>
+
+    <insert id="insertBatch">
+        INSERT INTO EMP (EMPNO, ENAME, JOB, MGR,
+        HIREDATE, SAL, COMM, DEPTNO, GENDER)
+        select ct.* from(
+        <foreach collection="emps" item="emp" open="(" close=")" separator="UNION">
+            select #{emp.empno}, #{emp.ename}, #{emp.job}, #{emp.mgr}, #{emp.hiredate}, #{emp.sal}, #{emp.comm}, #{emp.dept.deptno}, #{emp.gender}
+            from dual
+        </foreach>
+        ) ct
+
+    </insert>
+    <sql id="comsql">
+        select * from emp
+    </sql>
+    <select id="comsqlTest" resultType="com.mybatis.model.Emp">
+        <include refid="comsql">
+        </include>
+    </select>
+
+    <select id="empbyNo" resultType="com.mybatis.model.Emp">
+        <include refid="comsql">
+        </include>
+        where empno = #{empno}
+    </select>
+</mapper>

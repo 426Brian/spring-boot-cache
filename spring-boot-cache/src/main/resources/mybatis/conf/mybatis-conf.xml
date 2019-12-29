@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//conf.mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+
+    <!-- 1. properties 标签
+            可以通过使用properties 来引入外部properties 配置文件的内容
+            通常用于引入数据库的连接信息配置文件
+         resource: 引入类路径或磁盘路径下的资源
+         url: 引入网络路径下的资源
+         url: file:///var/mappers/xx.properties-->
+    <properties resource="mybatis/conf/jdbc.properties"></properties>
+
+    <!-- 2. settings 标签
+         用于设置mybatis 的某些属性如
+                                1. 采用驼峰命名
+                                2. 全局的null 处理方式
+                                3. 延迟加载
+                                4. 缓存等-->
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true" />
+        <setting name="logImpl" value="STDOUT_LOGGING" />
+
+        <!--字段为null时，全局配置-->
+        <setting name="jdbcTypeForNull" value="NULL"/>
+
+        <!-- 延迟加载 -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="aggressiveLazyLoading" value="false"/>
+            <!-- 二级缓存 -->
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
+
+
+    <!-- 3. typeAliases
+            别名处理器 指定包下面的实体类的别名 默认为类的首字母消息-->
+    <typeAliases>
+        <typeAlias alias="DemoUser" type="com.mybatis.model.DemoUser"></typeAlias>
+
+        <!--批量起别名， 当冲突时可以在具体类上用注解@Alias起别名-->
+        <package name="com.conf.mybatis.model"/>
+    </typeAliases>
+
+    <!--注册插件-->
+<!--
+    <plugins>
+        &lt;!&ndash;拦截插件&ndash;&gt;
+        <plugin interceptor="com.mybatis.plugin.MyFirstPlugin">
+            <property name="user" value="root"/>
+            <property name="password" value="12346"/>
+        </plugin>
+
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <property name="reasonable" value="true"/>
+        </plugin>
+
+    </plugins>
+-->
+    <!-- 4. environments 可以配置多种环境, default 指定当前应用的具体环境, 可以达到快速切换的效果
+        environment 配置一个具体的环境信息, 必须有两个标签, id表示当前环境的唯一表示
+        transactionManager 事务管理器, 事务管理器注册在Configuration 中
+                            自定义事务管理器：自己写实现TransactionFactory 接口的类
+        dataSource: 数据源
+            type: 数据源类型 JNDI 对应 JndiDataSourceFactory
+                            POOLED 对应 PooledDataSourceFactory
+                            UNPOOLED 对应  UnpooledDataSourceFactory
+               自定义数据源  实现DataSourceFactory 接口, type 是全类名-->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="url" value="${jdbc.url}"/>
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="username" value="${jdbc.user}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+   <!-- 5. databaseIdProvider 支持多数据库厂商的
+    type="DB_VENDOR" VendorDatabaseIdProvider
+            作用是得到数据库厂商的标识(驱动getDatabaseProductName())-->
+
+        <databaseIdProvider type="DB_VENDOR">
+            <!--为不同的数据库厂商起别名, 别名的value 值可以在封装sql 的xml文件中, 比如DemoUser.xml 文件中
+           getUserById 标识的sql 中有databaseId="oracle" 这个属性表明该sql 是在oracle 数据库中使用的 -->
+            <property name="ORACLE" value="oracle"/>
+            <property name="MySQL" value="mysql"/>
+        </databaseIdProvider>
+
+    <!--
+     6. mappers 将sql 封装文件注册到全局配置中
+                     resource 属性 引用类路径下的sql 映射文件
+                     url 属性网络路径或磁盘路径下的sql 映射文件
+                            url: file:///var/mappers/xx.xml
+                     class 属性注册接口
+                            1. 有sql 映射文件, 映射文件名必须和接口同名, 并且放在与接口同一目录下
+                            2. 没有sql 映射文件, 所有sql 都是利用注解写在接口的方法上
+                            -->
+
+    <mappers>
+        <!-- 属性注册接口的方式
+        <mapper class="com/mybatis/dao/DemoUseMapper"/>-->
+       <!-- <mapper resource="conf/mybatis/impl/DemoUser.xml"/>
+        <mapper resource="conf/mybatis/impl/DeptMapper.xml"/>
+        <mapper resource="conf/mybatis/impl/EmpMapper.xml"/>
+        <mapper resource="conf/mybatis/impl/EmloyeeDynamicSql.xml"/>
+        <mapper resource="conf/mybatis/impl/EmloyeeTest.xml"/>-->
+        <!-- package 用于批量注册接口, 接口的名字要与sql 映射同包且同名
+        <package name="com.mybatis"></package>
+        -->
+    </mappers>
+</configuration>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//conf.mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.dao.EmployeeMapper">
+    <!--ehcach二级缓存-->
+    <!--<cache type="org.conf.mybatis.caches.ehcache.EhcacheCache">-->
+    <!--</cache>-->
+
+   <select id="getbyEmpno" resultType="com.mybatis.model.Emp">
+       <include refid="selectEmp"/>
+        <where>
+            <if test="empno != null">
+                empno = #{empno}
+            </if>
+
+        </where>
+    </select>
+
+    <select id="getEmps" resultType="com.mybatis.model.Emp">
+        <include refid="selectEmp"/>
+    </select>
+
+    <sql id="selectEmp">
+       select * from EMP
+    </sql>
+</mapper>
